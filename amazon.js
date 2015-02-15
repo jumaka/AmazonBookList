@@ -249,7 +249,14 @@ function getbookbatch(fn, start, bsize, books, steps) {
         if((typeof(js.OwnershipData.success) !== 'undefined')&&
         		(js.OwnershipData.success === true)) {
             books.push.apply(books, js.OwnershipData.items);
-            if(js.OwnershipData.hasMoreItems) {
+
+            // change to the web service call from amazon now fails if
+            // you try and move beyond 1000 rather than just returning
+            // no more data
+            //
+            // added explicit limit check
+
+            if((js.OwnershipData.hasMoreItems)&&(start + bsize < 1000)) {
                 getbookbatch(fn, start + bsize, bsize, books, steps);
             }
             else
