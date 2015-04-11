@@ -4,7 +4,7 @@ A phantomjs script to extract the list of kindle books from amazon.co.uk
  
 ## Usage:
 
-    phantomjs --ssl-protocol=any amazon.js e-mail password
+    phantomjs --ssl-protocol=any amazon.js [-latest] e-mail password
 
 ## Outputs
 
@@ -12,6 +12,8 @@ Two files:
 
 1. booklist.txt - a JSON stringified representation of the items
 2. booklist.csv - a CSV version of the relevant fields from the page
+
+The optional `-latest` flag only extracts up to the latest 1000 books.
 
 ## Notes (here be dragons ...)
 

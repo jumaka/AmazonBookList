@@ -3,7 +3,8 @@
  * Extract kindle book list from the amazon web site
  * Code is written in phantomjs
  * 
- * Usage: phantomjs --ssl-protocol=any amazon.js e-mail password
+ * Usage: phantomjs --ssl-protocol=any [-latest] amazon.js e-mail password
+ * 
  * 
  * Outputs two files:
  * 
@@ -18,6 +19,8 @@
  * have over 2000 books you will not get a full listing - has been tested on a library
  * with 3500+ books. The book list is queried by decending then ascending date, then
  * title, then author. Duplicates are removed.
+ * 
+ * The -latest option only extracts up to 1000 latest books
  * 
  * The Phantomjs browser needs to pretend to be an interactive browser 
  * (the userAgent string is from Chrome and may get out of date). If the user agent
@@ -36,17 +39,23 @@
 var page = require('webpage').create(),
     system = require('system'),
     fs = require('fs'),
-    email, pass, loadInProgress = false, multiLoad = false, stepindex = 0, steps = [];
+    email, pass, loadInProgress = false, multiLoad = false, stepindex = 0, steps = [], latest = false;
 
 page.settings.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36';
 console.log('Using user agent of ' + page.settings.userAgent);
 
-if (system.args.length !== 3) {
-    console.log('Usage: amazon.js <user> <pass>');
+if ((system.args.length !== 3)&&((system.args.length != 4)||(system.args[1]!= '-latest'))) {
+    console.log('Usage: amazon.js [-latest] <user> <pass>');
     phantom.exit();
 } else {
-    email = system.args[1];
-    pass = system.args[2];
+	if(system.args[1] == '-latest') {
+	    email = system.args[2];
+	    pass = system.args[3];
+		latest = true;
+	} else {
+	    email = system.args[1];
+	    pass = system.args[2];
+	}
     console.log("User: " + email);
 }
 
@@ -139,9 +148,14 @@ steps[3] = function() {
 steps[4] = function() {
     // get the book list
     var bs = 50;
-    var methods = [["DESCENDING", "DATE"], ["ASCENDING", "DATE"], 
-                   ["DESCENDING", "TITLE"], ["ASCENDING", "TITLE"],
-                   ["DESCENDING", "AUTHOR"], ["ASCENDING", "AUTHOR"]];
+    var methods = [["DESCENDING", "DATE"]];
+    if(!latest) {
+    	methods = [["DESCENDING", "DATE"], ["ASCENDING", "DATE"], 
+    	            ["DESCENDING", "TITLE"], ["ASCENDING", "TITLE"],
+    	            ["DESCENDING", "AUTHOR"], ["ASCENDING", "AUTHOR"]];
+    }
+  
+                   ;
     console.log('GETTING THE BOOK LIST');
     getbookbatch('booklist', 0, bs, [], methods);
 };
