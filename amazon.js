@@ -41,7 +41,7 @@ var page = require('webpage').create(),
     fs = require('fs'),
     email, pass, loadInProgress = false, multiLoad = false, stepindex = 0, steps = [], latest = false, csrf='';
 
-page.settings.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36';
+page.settings.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/55.0.2883.59 Chrome/55.0.2883.59 Safari/537.36';
 console.log('Using user agent of ' + page.settings.userAgent);
 
 if ((system.args.length !== 3)&&((system.args.length != 4)||(system.args[1]!= '-latest'))) {
@@ -117,11 +117,27 @@ steps[1] = function() {
 };
 
 //Home page - will be redirected here after entering the login details
+// But not all the time sometimes we get a captcha at this point
 
 steps[2] = function () {
-    console.log('RUNNING HOME PAGE');
+    console.log('Running step 2');
     console.log('Rendering page to amazon.png');
     page.render('amazon.png');
+    if(page.title == "Amazon Sign In")
+    {
+        console.log("captcha found please look at amazon.png and enter the characters at the prompt");
+        system.stdout.writeLine('Enter Captcha: ');
+        var cp = system.stdin.readLine();
+        console.log('Captcha: ' + cp)
+        // console.log(page.evaluate(function() { return document.body.innerHTML}));
+        page.evaluate(function(e, p, c) {
+            document.getElementById('ap_password').value = p;
+            document.getElementById('auth-captcha-guess').value = c;
+            document.getElementById('signInSubmit').click();
+          }, email, pass, cp);
+    }
+    console.log('Rendering page to amazon_next.png');
+    page.render('amazon_next.png');
 };
 
 // Load the Manage Devices page which will initialise the cookies to call
