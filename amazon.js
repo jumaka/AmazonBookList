@@ -93,7 +93,7 @@ page.onLoadFinished = function() {
 steps[0] = function() {
     // Initial page load
     console.log('RUNNING INITIAL PAGE');
-    page.open('http://www.amazon.co.uk/gp/yourstore/home/ref=nav_cs_ys',
+    page.open('https://www.amazon.co.uk/gp/yourstore/home/ref=nav_cs_ys',
         function(status) {
         if(status !== 'success') {
             console.log('Failed to load the page: ' + status);
