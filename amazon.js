@@ -103,7 +103,7 @@ steps[0] = function() {
 };
 
 // Login page - will be redirected here after going to the home page
-// fill in the fields
+// fill in the fields - now split into two stages
 
 steps[1] = function() {
     console.log('RUNNING LOGIN PAGE');
@@ -111,6 +111,20 @@ steps[1] = function() {
     page.render('amazon_login.png');
     page.evaluate(function(e, p) {
         document.getElementById('ap_email').value = e;
+	// there are two continue id items - the span and the button
+	// select by class
+        document.getElementsByClassName('a-button-input')[0].click()
+    }, email, pass);
+};
+
+// Login page - will be redirected here after going to the home page
+// fill in the fields - part 2
+
+steps[2] = function() {
+    console.log('RUNNING LOGIN PAGE 2');
+    console.log('Rendering page to amazon_login2.png');
+    page.render('amazon_login2.png');
+    page.evaluate(function(e, p) {
         document.getElementById('ap_password').value = p;
         document.getElementById('signInSubmit').click();
     }, email, pass);
@@ -119,8 +133,8 @@ steps[1] = function() {
 //Home page - will be redirected here after entering the login details
 // But not all the time sometimes we get a captcha at this point
 
-steps[2] = function () {
-    console.log('Running step 2');
+steps[3] = function () {
+    console.log('Running step 3');
     console.log('Rendering page to amazon.png');
     page.render('amazon.png');
     if(page.title == "Amazon Sign In")
@@ -143,7 +157,7 @@ steps[2] = function () {
 // Load the Manage Devices page which will initialise the cookies to call
 // the web service. This visit sometimes hangs.
 
-steps[3] = function() {
+steps[4] = function() {
     // Load the devices page
 
     console.log('RUNNING DEVICES PAGE');
@@ -171,11 +185,11 @@ steps[3] = function() {
 
 // Make the calls to the book list web service - returns JSON
 
-steps[4] = function() {
+steps[5] = function() {
     // get the book list
     var bs = 50;
     var methods = [["DESCENDING", "DATE"]];
-    console.log('Starting step 4')
+    console.log('Starting step 5')
     if(!latest) {
     	methods = [["DESCENDING", "DATE"], ["ASCENDING", "DATE"],
     	            ["DESCENDING", "TITLE"], ["ASCENDING", "TITLE"],
@@ -189,7 +203,7 @@ steps[4] = function() {
 
 // Last step exit phantom
 
-steps[5] = function() {
+steps[6] = function() {
     phantom.exit();
 };
 
